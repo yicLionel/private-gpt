@@ -42,6 +42,9 @@ from private_gpt.server.chat.interceptors.ping_loop_interceptor import PingInter
 from private_gpt.server.chat.interceptors.platform_guidelines_interceptor import (
     PlatformGuidelinesInterceptor,
 )
+from private_gpt.server.chat.interceptors.prompt_injection_interceptor import (
+    PromptInjectionRequestInterceptor,
+)
 from private_gpt.server.chat.interceptors.skill_tool_visibility_interceptor import (
     SkillToolVisibilityInterceptor,
 )
@@ -132,6 +135,7 @@ class ChatInterceptorService:
             .add_range(
                 "document",
                 requests=[
+                    PromptInjectionRequestInterceptor(),
                     citation_interceptor,
                     DocumentProcessingRequestInterceptor(
                         add_context_to_system_prompt=False,
