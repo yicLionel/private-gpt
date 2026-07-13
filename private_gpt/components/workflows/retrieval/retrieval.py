@@ -23,6 +23,10 @@ from private_gpt.components.engines.citations.utils import (
     init_nodes_with_shorter_ids,
 )
 from private_gpt.components.workflows.types import AnyContext
+from private_gpt.components.workflows.retrieval.trace import (
+    RetrievalTrace,
+    build_retrieval_trace,
+)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -79,6 +83,9 @@ class RetrieverResultEvent(StopEvent):
 
     nodes: list[NodeWithScore] = Field(description="The final nodes retrieved.")
     source: ToolOutput = Field(description="The source of the nodes.")
+    trace: RetrievalTrace | None = Field(
+        default=None, description="Structured retrieval trace without document text."
+    )
 
 
 class RetrievalProgressEvent(Event):
@@ -134,6 +141,7 @@ class RetrieverWorkflow(Workflow):
 
         node_count = len(nodes)
         logger.debug(f"Retrieved {node_count} raw nodes")
+        await ctx.store.set("raw_nodes", nodes)
 
         if node_count == 0:
             return FinalNodesRetrievalEvent(
@@ -223,13 +231,16 @@ class RetrieverWorkflow(Workflow):
         logger.debug(f"Finalizing {len(ev.nodes)} nodes")
 
         query: QueryType | None = await ctx.store.get("query")
+        raw_nodes: list[NodeWithScore] = await ctx.store.get("raw_nodes") or []
+        trace = build_retrieval_trace(str(query), raw_nodes, ev.nodes)
+        logger.info("retrieval_trace=%s", trace.model_dump_json())
 
         source = ToolOutput(
             tool_name="retriever",
             content=f"Retrieved {len(ev.nodes)} nodes"
             if ev.nodes
             else "No relevant nodes found.",
-            raw_input={"message": query},
+            raw_input={"message": query, "trace": trace.model_dump(mode="json")},
             raw_output=ev.nodes,
         )
 
@@ -241,7 +252,7 @@ class RetrieverWorkflow(Workflow):
             )
 
         logger.debug(f"Finalized {len(ev.nodes)} nodes for query: {query}")
-        return RetrieverResultEvent(nodes=ev.nodes, source=source)
+        return RetrieverResultEvent(nodes=ev.nodes, source=source, trace=trace)
 
     async def _get_node_postprocessors(
         self, **kwargs: Any
