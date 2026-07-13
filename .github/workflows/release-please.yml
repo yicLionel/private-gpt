@@ -18,4 +18,4 @@ jobs:
         with:
           config-file: .github/release_please/.release-please-config.json
           manifest-file: .github/release_please/.release-please-manifest.json
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT }}
