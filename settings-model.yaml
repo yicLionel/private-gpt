@@ -1,0 +1,22 @@
+llm:
+  default_model: qwen3.5:4b
+  auto_discover_models: false
+
+embedding:
+  default_model: mxbai-embed-large
+  auto_discover_models: false
+
+models:
+  - name: qwen3.5:4b
+    type: llm
+    mode: openai
+    context_window: 8192
+    prompt_style: chat
+    support_tools: false
+    support_reasoning: false
+    support_image: 0
+
+  - name: mxbai-embed-large
+    type: embedding
+    mode: openai
+    context_window: 512
