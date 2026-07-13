@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
@@ -11,6 +12,7 @@ from private_gpt.components.engines.chat_loop.models.chat_loop_interceptor_conte
 from private_gpt.components.engines.citations.utils import (
     extract_citations_by_original_text,
 )
+from private_gpt.components.engines.citations.validation import validate_citations
 from private_gpt.events.models import (
     Event,
     RawContentBlockDeltaEvent,
@@ -21,6 +23,9 @@ from private_gpt.events.models import (
 
 if TYPE_CHECKING:
     from private_gpt.components.engines.citations.types import Citation, Document
+
+
+logger = logging.getLogger(__name__)
 
 
 class ExtractCitationInterceptor(ChatResponseLoopInterceptor):
@@ -37,6 +42,16 @@ class ExtractCitationInterceptor(ChatResponseLoopInterceptor):
         self._current_text = ""
 
     async def on_iteration_end(self, context: ChatLoopInterceptorContext) -> None:
+        documents = self._documents or context.state.input.context_stack.all_documents()
+        validation = validate_citations(self._current_text, documents)
+        context.metadata["citation_validation"] = validation.as_dict()
+        if validation.invalid_ids:
+            logger.warning(
+                "citation_validation_failed=%s", validation.as_dict()
+            )
+        else:
+            logger.info("citation_validation=%s", validation.as_dict())
+
         # Mutate the context state to include the final citations for this iteration
         if self._send_citations:
             new_state = context.state.model_copy(deep=True)
