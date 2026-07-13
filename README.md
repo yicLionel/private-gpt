@@ -277,3 +277,11 @@ Use **Zylon** if you need the full enterprise AI infrastructure around it: deplo
 - [Community Forks](https://docs.privategpt.dev/community/forks) — interesting forks and derivatives by the community
 
 Pull requests are welcome. If your PR doesn't fit the upstream roadmap, you can [add your fork to the Community Forks page](https://docs.privategpt.dev/community/forks) instead.
+
+---
+
+## Acknowledgements
+
+This project is a fork of [PrivateGPT](https://github.com/zylon-ai/private-gpt) by [Zylon](https://zylon.ai), the open-source API layer for local model-powered AI applications. All credit for the original architecture and codebase goes to the Zylon team.
+
+See the [original repository](https://github.com/zylon-ai/private-gpt) for upstream development and documentation.
