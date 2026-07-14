@@ -89,7 +89,7 @@ class UntrustedContentWrapper(ChatRequestLoopInterceptor):
 
     @classmethod
     def detect(cls, text: str) -> ContentSanitizationResult:
-        if not text or _UNTRUSTED_START in text:
+        if not text or text.strip().startswith(_UNTRUSTED_START):
             return ContentSanitizationResult(False, [], text)
 
         lowered = text.casefold()
