@@ -46,9 +46,7 @@ class ExtractCitationInterceptor(ChatResponseLoopInterceptor):
         validation = validate_citations(self._current_text, documents)
         context.metadata["citation_validation"] = validation.as_dict()
         if validation.invalid_ids:
-            logger.warning(
-                "citation_validation_failed=%s", validation.as_dict()
-            )
+            logger.warning("citation_validation_failed=%s", validation.as_dict())
         else:
             logger.info("citation_validation=%s", validation.as_dict())
 

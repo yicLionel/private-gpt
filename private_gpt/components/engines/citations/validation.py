@@ -44,7 +44,9 @@ def validate_citations(
         citation_id for citation_id in referenced_ids if citation_id in available_ids
     ]
     invalid_ids = [
-        citation_id for citation_id in referenced_ids if citation_id not in available_ids
+        citation_id
+        for citation_id in referenced_ids
+        if citation_id not in available_ids
     ]
     validity = round(len(valid_ids) / len(referenced_ids), 3) if referenced_ids else 1.0
     return CitationValidationResult(

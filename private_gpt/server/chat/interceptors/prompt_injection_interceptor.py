@@ -75,9 +75,7 @@ class UntrustedContentWrapper(ChatRequestLoopInterceptor):
         ),
         (
             "execute_embedded_command",
-            (
-                r"(?:execute|run|call|执行|运行|调用).{0,30}(?:bash|shell|命令|工具)",
-            ),
+            (r"(?:execute|run|call|执行|运行|调用).{0,30}(?:bash|shell|命令|工具)",),
         ),
         (
             "treat_document_as_instruction",
@@ -96,7 +94,9 @@ class UntrustedContentWrapper(ChatRequestLoopInterceptor):
         rules = [
             name
             for name, patterns in cls._RULES
-            if any(re.search(pattern, lowered, flags=re.IGNORECASE) for pattern in patterns)
+            if any(
+                re.search(pattern, lowered, flags=re.IGNORECASE) for pattern in patterns
+            )
         ]
         if not rules:
             return ContentSanitizationResult(False, [], text)
@@ -163,7 +163,9 @@ class UntrustedContentWrapper(ChatRequestLoopInterceptor):
                 )
             else:
                 layers.append(layer)
-        state.input.context_stack = state.input.context_stack.model_copy(update={"layers": layers})
+        state.input.context_stack = state.input.context_stack.model_copy(
+            update={"layers": layers}
+        )
 
         context.metadata["untrusted_content"] = {
             "detected": bool(user_count or document_count),
