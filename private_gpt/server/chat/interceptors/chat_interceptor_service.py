@@ -43,7 +43,7 @@ from private_gpt.server.chat.interceptors.platform_guidelines_interceptor import
     PlatformGuidelinesInterceptor,
 )
 from private_gpt.server.chat.interceptors.prompt_injection_interceptor import (
-    PromptInjectionRequestInterceptor,
+    UntrustedContentWrapper,
 )
 from private_gpt.server.chat.interceptors.skill_tool_visibility_interceptor import (
     SkillToolVisibilityInterceptor,
@@ -135,7 +135,7 @@ class ChatInterceptorService:
             .add_range(
                 "document",
                 requests=[
-                    PromptInjectionRequestInterceptor(),
+                    UntrustedContentWrapper(),
                     citation_interceptor,
                     DocumentProcessingRequestInterceptor(
                         add_context_to_system_prompt=False,
